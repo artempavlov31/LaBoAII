@@ -1,9 +1,15 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\PSU\\L\u0026BoAII\\laba1\\task1-3\\",
+  "WorkspaceRootPath": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task1-3\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D5651A9C-1641-4FAC-8656-F4AE0E54D331}|task1-3\\task1-3.vcxproj|D:\\PSU\\L\u0026BoAII\\laba1\\task1-3\\task1-3\\task1-3.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{B7F365A9-9247-459D-8B0B-28FE1726D432}|..\\task5\\task5.vcxproj|C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task5\\task5.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8BA92413-42F2-4815-BD92-AABFB4BC0D8C}|..\\task4\\task4.vcxproj|C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task4\\task4.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D5651A9C-1641-4FAC-8656-F4AE0E54D331}|task1-3\\task1-3.vcxproj|C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task1-3\\task1-3\\task1-3.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{D5651A9C-1641-4FAC-8656-F4AE0E54D331}|task1-3\\task1-3.vcxproj|solutionrelative:task1-3\\task1-3.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -19,15 +25,48 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+<<<<<<< HEAD
               "Title": "task1-3.cpp",
               "DocumentMoniker": "D:\\PSU\\L\u0026BoAII\\laba1\\task1-3\\task1-3\\task1-3.cpp",
               "RelativeDocumentMoniker": "task1-3\\task1-3.cpp",
               "ToolTip": "D:\\PSU\\L\u0026BoAII\\laba1\\task1-3\\task1-3\\task1-3.cpp*",
               "RelativeToolTip": "task1-3\\task1-3.cpp*",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+=======
+              "Title": "task5.cpp",
+              "DocumentMoniker": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task5\\task5.cpp",
+              "RelativeDocumentMoniker": "..\\task5\\task5.cpp",
+              "ToolTip": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task5\\task5.cpp",
+              "RelativeToolTip": "..\\task5\\task5.cpp",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAiwFcAAAABAAAAAAAAAA==",
+>>>>>>> 4ce762111a02d501defe4cf38077d597b5796a3b
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-09-10T20:12:07.109Z",
+              "WhenOpened": "2026-09-11T09:40:47.834Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "task4.cpp",
+              "DocumentMoniker": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task1-3\\task4\\task4.cpp",
+              "RelativeDocumentMoniker": "task4\\task4.cpp",
+              "ToolTip": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task1-3\\task4\\task4.cpp",
+              "RelativeToolTip": "task4\\task4.cpp",
+              "ViewState": "AgIAABoAAAAAAAAAAAAcwCwAAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-09-11T09:34:05.97Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "task1-3.cpp",
+              "DocumentMoniker": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task1-3\\task1-3\\task1-3.cpp",
+              "RelativeDocumentMoniker": "task1-3\\task1-3.cpp",
+              "ToolTip": "C:\\Users\\Admin\\OneDrive\\Desktop\\CodexProjects\\LaBoAII\\laba1\\task1-3\\task1-3\\task1-3.cpp",
+              "RelativeToolTip": "task1-3\\task1-3.cpp",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAAB0AAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-09-10T20:12:07.109Z"
             }
           ]
         }

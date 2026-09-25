@@ -7,34 +7,47 @@
 int main() {
 	setlocale(LC_ALL, "rus");
 	srand(time(NULL));
-	int i;
+	int i,j;
 	int n;
-	int max, min;
+	int max = 40;
+	int min=-15;
+	int c = 0;
+	int sum = 0;
 	printf_s("Введите размер массива:");
 	scanf_s("%d",&n);
-	printf_s("Введите миниммальное значение:");
-	scanf_s("%d", &min);
-	printf_s("Введите максимальное значение:");
-	scanf_s("%d", &max);
-	int *arr = (int*)malloc(n * sizeof(int));
-	printf("Массив:");
-	for (i = 0; i < n; i++) {
-		arr[i]= min + rand() % (max - min + 1);
-		printf("%d ", arr[i]);
+	int **arr = (int**)malloc(n * sizeof(int*));
+	for (int i = 0; i < n; i++) {
+		arr[i] = (int*)malloc(n * sizeof(int));
 	}
-	printf("\n");
-	min = arr[0];
-	max = arr[0];
-	for (i = 0; i < n; i++) {
-		if (arr[i] > max) {
-			max = arr[i];
+	printf("Массив:\n");
+	for (i = 0; i < n; i++){
+		for (j = 0; j < n; j++) {
+			arr[i][j] = min + rand() % (max - min + 1);
+			printf("%4d ", arr[i][j]);
 		}
-		if (arr[i] < min) {
-			min = arr[i];
+		printf("\n");
+	}
+	min = arr[0][0];
+	max = arr[0][0];
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+
+			if (arr[i][j] > max) {
+				max = arr[i][j];
+			}
+			if (arr[i][j] < min) {
+				min = arr[i][j];
+			}
+			if (arr[i][j] < 0) {
+				c++;
+				sum += arr[i][j];
+			}
 		}
 	}
 	printf("Минимальное значение:%d\n", min);
 	printf("Максимальное значение:%d\n", max);
 	printf("Разница между максимальным и минимальным значениями:%d", max - min);
+	printf("\nКоличество отрицательных элементов:%d\n", c);
+	printf("Сумма отрицательных элементов:%d\n", sum);
 	return 0;
 }

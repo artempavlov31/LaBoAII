@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
-#define MAX_SIZE 2000
+#define MAX_SIZE 10000
 
 int a[MAX_SIZE][MAX_SIZE];
 int b[MAX_SIZE][MAX_SIZE];
@@ -17,7 +17,7 @@ int main(void)
     clock_t start, end;
     double time_program, time_multiply;
 
-    printf("Введите размер матрицы (Мин - 1, макс - 2000): ");
+    printf("Введите размер матрицы (Мин - 1, макс - 10000): ");
     scanf_s("%d", &n);
 
     if (n < 1 || n > MAX_SIZE) {

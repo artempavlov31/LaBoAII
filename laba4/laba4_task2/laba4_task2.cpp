@@ -27,6 +27,7 @@ Node* createNode(int data)
     return node;
 }
 
+
 Node* insertNode(Node* root, int data)
 {
     if (root == NULL)
@@ -38,9 +39,13 @@ Node* insertNode(Node* root, int data)
     {
         root->left = insertNode(root->left, data);
     }
-    else
+    else if (data > root->data)
     {
         root->right = insertNode(root->right, data);
+    }
+	else if (data == root->data)
+    {
+        printf("Такое значение уже существует!\n");
     }
 
     return root;
@@ -105,7 +110,7 @@ int main()
     int value;
 
     printf("Введите целые числа для построения дерева.\n");
-    printf("Повторяющиеся значения разрешены.\n");
+    printf("Повторяющиеся значения не добавляются.\n");
     printf("Для завершения ввода введите -1.\n\n");
 
     while (true)

@@ -3,6 +3,18 @@
 #include <time.h>
 #include <stdlib.h>
 
+int countEdges(int** matrix, int N) {
+    int count = 0;
+    for (int i = 0; i < N; i++) {
+        for (int j = i + 1; j < N; j++) {
+            if (matrix[i][j] == 1) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 int main() {
     srand(time(0));
     setlocale(LC_ALL, "Russian");
@@ -49,10 +61,12 @@ int main() {
         }
         printf("\n");
     }
-        for (int i = 0; i < N; i++) {
-            free(matrix[i]);
-        }
-        free(matrix);
-        return 0;
+    int edgeCount = countEdges(matrix, N);
+    printf("Количество рёбер в графе: %d\n", edgeCount);
+    for (int i = 0; i < N; i++) {
+        free(matrix[i]);
+    }
+    free(matrix);
+    return 0;
 
 }

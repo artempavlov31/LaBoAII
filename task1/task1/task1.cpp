@@ -14,6 +14,49 @@ int countEdges(int** matrix, int N) {
     }
     return count;
 }
+void findVerticles(int** matrix, int N) {
+    int degree;
+    bool isIsolated;
+    bool terminal;
+    bool dominant;
+    for (int i = 0; i < N; i++) {
+        degree = 0;
+        isIsolated = true;
+        terminal = false;
+        dominant = true;
+        for (int j = 0; j < N; j++) {
+            if (matrix[i][j] == 1) {
+                degree++;
+                isIsolated = false;
+            }
+            if (matrix[i][j] == 1 && degree == 1) {
+                terminal = true;
+            }
+            if (matrix[i][j] == 0 && i != j) {
+                dominant = false;
+            }
+        }
+        printf("Вершина %d: степень %d, ", i + 1, degree);
+        if (isIsolated) {
+            printf("изолированная, ");
+        }
+        else {
+            printf("не изолированная, ");
+        }
+        if (terminal) {
+            printf("терминальная, ");
+        }
+        else {
+            printf("не терминальная, ");
+        }
+        if (dominant) {
+            printf("доминирующая\n");
+        }
+        else {
+            printf("не доминирующая\n");
+        }
+    }
+}
 
 int main() {
     srand(time(0));
@@ -61,6 +104,8 @@ int main() {
         }
         printf("\n");
     }
+    printf("Характеристики вершин:\n");
+    findVerticles(matrix, N);
     int edgeCount = countEdges(matrix, N);
     printf("Количество рёбер в графе: %d\n", edgeCount);
     for (int i = 0; i < N; i++) {

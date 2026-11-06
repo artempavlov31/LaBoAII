@@ -12,7 +12,7 @@ struct Node
 };
 
 Node* createNode(int data)
-{
+{   
     Node* node = (Node*)malloc(sizeof(Node));
 
     if (node == NULL)
@@ -51,6 +51,45 @@ Node* insertNode(Node* root, int data)
     return root;
 }
 
+Node* deleteNode(Node* root, int data)
+{
+    if (root == NULL)
+    {
+        return root;
+    }
+    if (data < root->data)
+    {
+        root->left = deleteNode(root->left, data);
+    }
+    else if (data > root->data)
+    {
+        root->right = deleteNode(root->right, data);
+    }
+    else
+    {
+        if (root->left == NULL)
+        {
+            Node* temp = root->right;
+            free(root);
+            return temp;
+        }
+        else if (root->right == NULL)
+        {
+            Node* temp = root->left;
+            free(root);
+            return temp;
+        }
+        Node* temp = root->right;
+        while (temp && temp->left != NULL)
+        {
+            temp = temp->left;
+        }
+        root->data = temp->data;
+        root->right = deleteNode(root->right, temp->data);
+    }
+    return root;
+}
+
 void printTree(const Node* root, int level)
 {
     if (root == NULL)
@@ -59,7 +98,7 @@ void printTree(const Node* root, int level)
     }
 
     printTree(root->right, level + 1);
-
+  
     for (int i = 0; i < level; i++)
     {
         printf("    ");
@@ -140,7 +179,16 @@ int main()
 
     printf("\nПостроенное дерево:\n");
     printTree(root, 0);
-
+	printf("\nВведите значение для удаления: ");
+    if (scanf_s("%d", &value) != 1)
+    {
+        printf("Ошибка ввода.\n");
+        deleteTree(root);
+        return 1;
+	}
+	root = deleteNode(root, value);
+	printf("\nДерево после удаления:\n");
+    printTree(root,0);
     printf("\nВведите значение для подсчёта: ");
 
     if (scanf_s("%d", &value) != 1)

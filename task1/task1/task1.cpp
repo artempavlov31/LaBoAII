@@ -29,13 +29,11 @@ void findVerticles(int** matrix, int N) {
                 degree++;
                 isIsolated = false;
             }
-            if (matrix[i][j] == 1 && degree == 1) {
-                terminal = true;
-            }
             if (matrix[i][j] == 0 && i != j) {
                 dominant = false;
             }
         }
+        terminal = (degree == 1);
         printf("Вершина %d: степень %d, ", i + 1, degree);
         if (isIsolated) {
             printf("изолированная, ");
@@ -88,13 +86,10 @@ int main() {
     }
     srand((unsigned int)time(NULL));
     for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            if (i == j) {
-                matrix[i][j] = 0;
-            }
-            else {
-                matrix[i][j] = rand() % 2;
-            }
+        matrix[i][i] = 0;
+        for (int j = i + 1; j < N; j++) {
+            matrix[i][j] = rand() % 2;
+            matrix[j][i] = matrix[i][j];
         }
     }
     printf("Матрица смежности графа:\n");

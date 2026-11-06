@@ -2,7 +2,15 @@
 #include <iostream>
 #include <time.h>
 #include <stdlib.h>
+#include <clocale>
 
+void generateSymmetricMatrix(int** matrix, int N) {
+    for (int i = 0; i < N; i++) {
+        for (int j = i + 1; j < N; j++) {
+            matrix[j][i] = matrix[i][j];
+        }
+    }
+}
 int countEdges(int** matrix, int N) {
     int count = 0;
     for (int i = 0; i < N; i++) {
@@ -60,7 +68,7 @@ void findVerticles(int** matrix, int N) {
 
 int main() {
     srand(time(0));
-    setlocale(LC_ALL, "Russian");
+	setlocale(LC_ALL, ".UTF8");
     int N;
     printf("Введите количество вершин графа: ");
     scanf("%d", &N);
@@ -97,6 +105,7 @@ int main() {
             }
         }
     }
+	generateSymmetricMatrix(matrix, N);
     printf("Матрица смежности графа:\n");
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {

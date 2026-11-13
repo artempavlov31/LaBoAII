@@ -4,17 +4,11 @@
 #include <stdlib.h>
 #include <clocale>
 
-void generateSymmetricMatrix(int** matrix, int N) {
-    for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
-            matrix[j][i] = matrix[i][j];
-        }
-    }
-}
+
 int countEdges(int** matrix, int N) {
     int count = 0;
     for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
+        for (int j = 0; j < N; j++) {
             if (matrix[i][j] == 1) {
                 count++;
             }
@@ -93,14 +87,17 @@ int main() {
         }
     }
     srand((unsigned int)time(NULL));
-    for (int i = 0; i < N; i++) {
-        matrix[i][i] = 0;
-        for (int j = i + 1; j < N; j++) {
+   for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+        if (i != j) {
             matrix[i][j] = rand() % 2;
-            matrix[j][i] = matrix[i][j];
+        }
+        else {
+            matrix[i][j] = 0;
         }
     }
-	generateSymmetricMatrix(matrix, N);
+}
+	
     printf("Матрица смежности графа:\n");
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {

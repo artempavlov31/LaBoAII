@@ -85,6 +85,14 @@ int** identifyVertices(int** matrix, int N, int u, int v) {
 
     return newMatrix;
 }
+int** contractEdge(int** matrix, int N, int u, int v){
+    if (matrix[u][v] != 1) {
+        return NULL;
+    }
+    return identifyVertices(matrix, N, u, v);
+}
+
+
 
 int main() {
     srand((unsigned int)time(NULL));
@@ -203,7 +211,44 @@ int main() {
         }
         printf("\n");
     }
+    printf("\nСтягивание ребра первого графа.\n");
+    printf("Введите номера двух вершин: ");
+    scanf("%d %d", &u, &v);
+    if (u < 1 || u > N || v < 1 || v > N || u == v) {
+        printf("Ошибка: введены некорректные номера вершин.\n");
+        return 1;
+    }
+    else if (matrix[u-1][v-1]!=1)
+    {
+        printf("Ошибка: введенные вершины не соединены ребром.\n");
+        return 1;
+    }
+    else
+    {
+        int** newMatrix = contractEdge(matrix, N, u - 1, v - 1);
+        if (newMatrix == NULL) {
+            printf("Ошибка создания новой матрицы.\n");
+            return 1;
+        }
 
+        
+        for (int i = 0; i < N; i++) {
+            free(matrix[i]);
+        }
+        free(matrix);
+
+        matrix = newMatrix;
+        N--;
+
+        printf("\nМатрица первого графа после стягивания ребра:\n");
+
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++) {
+                printf("%d ", matrix[i][j]);
+            }
+            printf("\n");
+        }
+    }
    
     printf("\nОтождествление вершин второго графа.\n");
     printf("Введите номера двух вершин: ");
@@ -238,7 +283,44 @@ int main() {
         }
         printf("\n");
     }
+    printf("\nСтягивание ребра второго графа.\n");
+    printf("Введите номера двух вершин: ");
+    scanf("%d %d", &u, &v);
+    if (u < 1 || u > N2 || v < 1 || v > N2 || u == v) {
+        printf("Ошибка: введены некорректные номера вершин.\n");
+        return 1;
+    }
+    else if (matrix2[u-1][v-1]!=1)
+    {
+        printf("Ошибка: введенные вершины не соединены ребром.\n");
+        return 1;
+    }
+    else
+    {
+        int** newMatrix2 = contractEdge(matrix2, N2, u - 1, v - 1);
+        if (newMatrix2 == NULL) {
+            printf("Ошибка создания новой матрицы.\n");
+            return 1;
+        }
 
+        
+        for (int i = 0; i < N2; i++) {
+            free(matrix2[i]);
+        }
+        free(matrix2);
+
+        matrix2 = newMatrix2;
+        N2--;
+
+        printf("\nМатрица второго графа после стягивания ребра:\n");
+
+        for (int i = 0; i < N2; i++) {
+            for (int j = 0; j < N2; j++) {
+                printf("%d ", matrix2[i][j]);
+            }
+            printf("\n");
+        }
+    }
     
     for (int i = 0; i < N; i++) {
         free(matrix[i]);

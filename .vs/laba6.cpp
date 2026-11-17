@@ -93,6 +93,62 @@ int** contractEdge(int** matrix, int N, int u, int v){
 }
 
 
+int** splitVertex(int** matrix, int N, int u) {
+    int newN = N + 1;
+
+    int** newMatrix = (int**)calloc(newN, sizeof(int*));
+
+    if (newMatrix == NULL) {
+        return NULL;
+    }
+
+    for (int i = 0; i < newN; i++) {
+        newMatrix[i] = (int*)calloc(newN, sizeof(int));
+
+        if (newMatrix[i] == NULL) {
+            for (int j = 0; j < i; j++) {
+                free(newMatrix[j]);
+            }
+
+            free(newMatrix);
+            return NULL;
+        }
+    }
+
+    int count = 0;
+
+    for (int i = 0; i < N; i++) {
+        if (i == u) {
+            continue;
+        }
+
+        for (int j = 0; j < N; j++) {
+            if (j == u) {
+                continue;
+            }
+
+            newMatrix[i][j] = matrix[i][j];
+        }
+
+        if (matrix[u][i] == 1) {
+            if (count % 2 == 0) {
+                newMatrix[u][i] = 1;
+                newMatrix[i][u] = 1;
+            }
+            else {
+                newMatrix[N][i] = 1;
+                newMatrix[i][N] = 1;
+            }
+
+            count++;
+        }
+    }
+
+    newMatrix[u][N] = 1;
+    newMatrix[N][u] = 1;
+
+    return newMatrix;
+}
 
 int main() {
     srand((unsigned int)time(NULL));
@@ -128,7 +184,6 @@ int main() {
             for (int j = 0; j < i; j++) {
                 free(matrix[j]);
             }
-
             free(matrix);
             free(matrix2);
             return 1;
@@ -142,13 +197,11 @@ int main() {
             for (int j = 0; j < i; j++) {
                 free(matrix2[j]);
             }
-
             free(matrix2);
 
             for (int j = 0; j < N; j++) {
                 free(matrix[j]);
             }
-
             free(matrix);
             return 1;
         }
@@ -176,8 +229,9 @@ int main() {
     }
 
     int u, v;
+    int** newMatrix = NULL;
+    int** newMatrix2 = NULL;
 
-   
     printf("\nОтождествление вершин первого графа.\n");
     printf("Введите номера двух вершин: ");
     scanf("%d %d", &u, &v);
@@ -187,14 +241,13 @@ int main() {
         return 1;
     }
 
-    int** newMatrix = identifyVertices(matrix, N, u - 1, v - 1);
+    newMatrix = identifyVertices(matrix, N, u - 1, v - 1);
 
     if (newMatrix == NULL) {
         printf("Ошибка создания новой матрицы.\n");
         return 1;
     }
 
-    
     for (int i = 0; i < N; i++) {
         free(matrix[i]);
     }
@@ -211,27 +264,27 @@ int main() {
         }
         printf("\n");
     }
+
     printf("\nСтягивание ребра первого графа.\n");
     printf("Введите номера двух вершин: ");
     scanf("%d %d", &u, &v);
+
     if (u < 1 || u > N || v < 1 || v > N || u == v) {
         printf("Ошибка: введены некорректные номера вершин.\n");
         return 1;
     }
-    else if (matrix[u-1][v-1]!=1)
-    {
+    else if (matrix[u - 1][v - 1] != 1) {
         printf("Ошибка: введенные вершины не соединены ребром.\n");
         return 1;
     }
-    else
-    {
-        int** newMatrix = contractEdge(matrix, N, u - 1, v - 1);
+    else {
+        newMatrix = contractEdge(matrix, N, u - 1, v - 1);
+
         if (newMatrix == NULL) {
             printf("Ошибка создания новой матрицы.\n");
             return 1;
         }
 
-        
         for (int i = 0; i < N; i++) {
             free(matrix[i]);
         }
@@ -249,7 +302,40 @@ int main() {
             printf("\n");
         }
     }
-   
+
+    printf("\nРасщепление вершины первого графа.\n");
+    printf("Введите номер вершины: ");
+    scanf("%d", &u);
+
+    if (u < 1 || u > N) {
+        printf("Ошибка: введен некорректный номер вершины.\n");
+        return 1;
+    }
+
+    newMatrix = splitVertex(matrix, N, u - 1);
+
+    if (newMatrix == NULL) {
+        printf("Ошибка создания новой матрицы.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < N; i++) {
+        free(matrix[i]);
+    }
+    free(matrix);
+
+    matrix = newMatrix;
+    N++;
+
+    printf("\nМатрица первого графа после расщепления вершины:\n");
+
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            printf("%d ", matrix[i][j]);
+        }
+        printf("\n");
+    }
+
     printf("\nОтождествление вершин второго графа.\n");
     printf("Введите номера двух вершин: ");
     scanf("%d %d", &u, &v);
@@ -259,14 +345,13 @@ int main() {
         return 1;
     }
 
-    int** newMatrix2 = identifyVertices(matrix2, N2, u - 1, v - 1);
+    newMatrix2 = identifyVertices(matrix2, N2, u - 1, v - 1);
 
     if (newMatrix2 == NULL) {
         printf("Ошибка создания новой матрицы.\n");
         return 1;
     }
 
-   
     for (int i = 0; i < N2; i++) {
         free(matrix2[i]);
     }
@@ -283,27 +368,27 @@ int main() {
         }
         printf("\n");
     }
+
     printf("\nСтягивание ребра второго графа.\n");
     printf("Введите номера двух вершин: ");
     scanf("%d %d", &u, &v);
+
     if (u < 1 || u > N2 || v < 1 || v > N2 || u == v) {
         printf("Ошибка: введены некорректные номера вершин.\n");
         return 1;
     }
-    else if (matrix2[u-1][v-1]!=1)
-    {
+    else if (matrix2[u - 1][v - 1] != 1) {
         printf("Ошибка: введенные вершины не соединены ребром.\n");
         return 1;
     }
-    else
-    {
-        int** newMatrix2 = contractEdge(matrix2, N2, u - 1, v - 1);
+    else {
+        newMatrix2 = contractEdge(matrix2, N2, u - 1, v - 1);
+
         if (newMatrix2 == NULL) {
             printf("Ошибка создания новой матрицы.\n");
             return 1;
         }
 
-        
         for (int i = 0; i < N2; i++) {
             free(matrix2[i]);
         }
@@ -321,7 +406,40 @@ int main() {
             printf("\n");
         }
     }
-    
+
+    printf("\nРасщепление вершины второго графа.\n");
+    printf("Введите номер вершины: ");
+    scanf("%d", &u);
+
+    if (u < 1 || u > N2) {
+        printf("Ошибка: введен некорректный номер вершины.\n");
+        return 1;
+    }
+
+    newMatrix2 = splitVertex(matrix2, N2, u - 1);
+
+    if (newMatrix2 == NULL) {
+        printf("Ошибка создания новой матрицы.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < N2; i++) {
+        free(matrix2[i]);
+    }
+    free(matrix2);
+
+    matrix2 = newMatrix2;
+    N2++;
+
+    printf("\nМатрица второго графа после расщепления вершины:\n");
+
+    for (int i = 0; i < N2; i++) {
+        for (int j = 0; j < N2; j++) {
+            printf("%d ", matrix2[i][j]);
+        }
+        printf("\n");
+    }
+
     for (int i = 0; i < N; i++) {
         free(matrix[i]);
     }

@@ -1,454 +1,267 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <locale.h>
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
+#include <initializer_list>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-void generateMatrix(int** matrix, int N) {
-    for (int i = 0; i < N; i++) {
-        for (int j = i + 1; j < N; j++) {
-            matrix[i][j] = rand() % 2;
-            matrix[j][i] = matrix[i][j];
+using Matrix = std::vector<std::vector<int>>;
+using Vertices = std::vector<std::size_t>;
+
+Matrix emptyMatrix(std::size_t size) {
+    return Matrix(size, std::vector<int>(size));
+}
+
+Matrix generateMatrix(std::size_t size) {
+    Matrix matrix = emptyMatrix(size);
+    for (std::size_t i = 0; i < size; ++i) {
+        for (std::size_t j = i + 1; j < size; ++j) {
+            matrix[i][j] = matrix[j][i] = std::rand() % 2;
         }
-        matrix[i][i] = 0;
+    }
+    return matrix;
+}
+
+void printMatrix(const Matrix& matrix) {
+    if (matrix.empty()) {
+        std::cout << "Граф пуст.\n";
+        return;
+    }
+
+    for (const auto& row : matrix) {
+        for (int value : row) {
+            std::cout << value << ' ';
+        }
+        std::cout << '\n';
     }
 }
 
-void generatesecondMatrix(int** matrix, int N2) {
-    for (int i = 0; i < N2; i++) {
-        for (int j = i + 1; j < N2; j++) {
-            matrix[i][j] = rand() % 2;
-            matrix[j][i] = matrix[i][j];
+Matrix identifyVertices(const Matrix& matrix, std::size_t u, std::size_t v) {
+    Vertices remaining;
+    for (std::size_t i = 0; i < matrix.size(); ++i) {
+        if (i != u && i != v) {
+            remaining.push_back(i);
         }
-        matrix[i][i] = 0;
     }
+
+    const std::size_t merged = remaining.size();
+    Matrix result = emptyMatrix(merged + 1);
+    for (std::size_t i = 0; i < merged; ++i) {
+        const auto original = remaining[i];
+        for (std::size_t j = 0; j < merged; ++j) {
+            result[i][j] = matrix[original][remaining[j]];
+        }
+        result[i][merged] = result[merged][i] = matrix[original][u] || matrix[original][v];
+    }
+    return result;
 }
 
-int** identifyVertices(int** matrix, int N, int u, int v) {
-    int newN = N - 1;
-
-    int** newMatrix = (int**)malloc(newN * sizeof(int*));
-
-    if (newMatrix == NULL) {
-        return NULL;
+Matrix contractEdge(const Matrix& matrix, std::size_t u, std::size_t v) {
+    if (!matrix[u][v]) {
+        throw std::invalid_argument("Выбранные вершины не смежны.");
     }
-
-    for (int i = 0; i < newN; i++) {
-        newMatrix[i] = (int*)calloc(newN, sizeof(int));
-
-        if (newMatrix[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(newMatrix[j]);
-            }
-
-            free(newMatrix);
-            return NULL;
-        }
-    }
-
-    int newI = 0;
-
-    for (int i = 0; i < N; i++) {
-        if (i == u || i == v) {
-            continue;
-        }
-
-        int newJ = 0;
-
-        for (int j = 0; j < N; j++) {
-            if (j == u || j == v) {
-                continue;
-            }
-
-            newMatrix[newI][newJ] = matrix[i][j];
-            newJ++;
-        }
-
-        newI++;
-    }
-
-    int z = newN - 1;
-    newI = 0;
-
-    for (int i = 0; i < N; i++) {
-        if (i == u || i == v) {
-            continue;
-        }
-
-        if (matrix[i][u] == 1 || matrix[i][v] == 1) {
-            newMatrix[newI][z] = 1;
-            newMatrix[z][newI] = 1;
-        }
-
-        newI++;
-    }
-
-    return newMatrix;
-}
-int** contractEdge(int** matrix, int N, int u, int v){
-    if (matrix[u][v] != 1) {
-        return NULL;
-    }
-    return identifyVertices(matrix, N, u, v);
+    return identifyVertices(matrix, u, v);
 }
 
-
-int** splitVertex(int** matrix, int N, int u) {
-    int newN = N + 1;
-
-    int** newMatrix = (int**)calloc(newN, sizeof(int*));
-
-    if (newMatrix == NULL) {
-        return NULL;
-    }
-
-    for (int i = 0; i < newN; i++) {
-        newMatrix[i] = (int*)calloc(newN, sizeof(int));
-
-        if (newMatrix[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(newMatrix[j]);
-            }
-
-            free(newMatrix);
-            return NULL;
-        }
-    }
-
-    int count = 0;
-
-    for (int i = 0; i < N; i++) {
+Matrix splitVertex(const Matrix& matrix, std::size_t u) {
+    const std::size_t extra = matrix.size();
+    Matrix result = emptyMatrix(extra + 1);
+    std::size_t target = u;
+    for (std::size_t i = 0; i < extra; ++i) {
         if (i == u) {
             continue;
         }
-
-        for (int j = 0; j < N; j++) {
-            if (j == u) {
-                continue;
+        for (std::size_t j = 0; j < extra; ++j) {
+            if (j != u) {
+                result[i][j] = matrix[i][j];
             }
-
-            newMatrix[i][j] = matrix[i][j];
         }
-
-        if (matrix[u][i] == 1) {
-            if (count % 2 == 0) {
-                newMatrix[u][i] = 1;
-                newMatrix[i][u] = 1;
-            }
-            else {
-                newMatrix[N][i] = 1;
-                newMatrix[i][N] = 1;
-            }
-
-            count++;
+        if (matrix[u][i]) {
+            result[target][i] = result[i][target] = 1;
+            target = target == u ? extra : u;
         }
     }
+    result[u][extra] = result[extra][u] = 1;
+    return result;
+}
 
-    newMatrix[u][N] = 1;
-    newMatrix[N][u] = 1;
+bool hasEdge(const Matrix& matrix, std::size_t u, std::size_t v) {
+    return u < matrix.size() && v < matrix.size() && matrix[u][v] != 0;
+}
 
-    return newMatrix;
+enum class GraphOperation { Union, Intersection, RingSum };
+
+Matrix combineGraphs(const Matrix& first, const Matrix& second, GraphOperation operation) {
+    const auto size = operation == GraphOperation::Intersection
+        ? std::min(first.size(), second.size())
+        : std::max(first.size(), second.size());
+    Matrix result = emptyMatrix(size);
+    for (std::size_t u = 0; u < size; ++u) {
+        for (std::size_t v = u + 1; v < size; ++v) {
+            const bool inFirst = hasEdge(first, u, v);
+            const bool inSecond = hasEdge(second, u, v);
+            bool edge = false;
+            switch (operation) {
+                case GraphOperation::Union: edge = inFirst || inSecond; break;
+                case GraphOperation::Intersection: edge = inFirst && inSecond; break;
+                case GraphOperation::RingSum: edge = inFirst != inSecond; break;
+            }
+            result[u][v] = result[v][u] = edge;
+        }
+    }
+    return result;
+}
+
+Vertices nonIsolatedVertices(const Matrix& matrix) {
+    Vertices labels;
+    for (std::size_t i = 0; i < matrix.size(); ++i) {
+        if (std::find(matrix[i].begin(), matrix[i].end(), 1) != matrix[i].end()) {
+            labels.push_back(i);
+        }
+    }
+    return labels;
+}
+
+Matrix keepVertices(const Matrix& matrix, const Vertices& labels) {
+    Matrix result = emptyMatrix(labels.size());
+    for (std::size_t i = 0; i < labels.size(); ++i) {
+        for (std::size_t j = 0; j < labels.size(); ++j) {
+            result[i][j] = matrix[labels[i]][labels[j]];
+        }
+    }
+    return result;
+}
+
+bool readNumbers(const char* prompt, std::initializer_list<int*> numbers) {
+    while (std::cout << prompt) {
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+            return false;
+        }
+        std::istringstream input(line);
+        for (int* number : numbers) {
+            input >> *number;
+        }
+        if (input && (input >> std::ws).eof()) {
+            return true;
+        }
+        std::cout << "Введите целые числа в указанном формате.\n";
+    }
+    return false;
+}
+
+bool readGraphSize(const char* prompt, int& size) {
+    while (readNumbers(prompt, {&size})) {
+        if (size >= 2) {
+            return true;
+        }
+        std::cout << "В графе должно быть минимум две вершины.\n";
+    }
+    return false;
+}
+
+bool readVertices(const Matrix& matrix, bool edgeRequired, std::size_t& u, std::size_t& v) {
+    int first = 0;
+    int second = 0;
+    while (readNumbers("Введите два разных номера вершин через пробел: ", {&first, &second})) {
+        if (first < 1 || second < 1 || static_cast<std::size_t>(first) > matrix.size()
+            || static_cast<std::size_t>(second) > matrix.size() || first == second) {
+            std::cout << "Проверьте номера вершин.\n";
+            continue;
+        }
+        u = first - 1;
+        v = second - 1;
+        if (!edgeRequired || matrix[u][v]) {
+            return true;
+        }
+        std::cout << "Между этими вершинами нет ребра. Выберите другую пару.\n";
+    }
+    return false;
+}
+
+bool showUnaryOperations(const Matrix& matrix, int graphNumber) {
+    std::cout << "\nУнарные операции для графа G" << graphNumber << "\n";
+    std::cout << "Каждая операция выполняется для исходной матрицы.\n";
+
+    std::size_t u = 0;
+    std::size_t v = 0;
+    std::cout << "Отождествление вершин\n";
+    if (!readVertices(matrix, false, u, v)) {
+        return false;
+    }
+    std::cout << "После отождествления:\n";
+    printMatrix(identifyVertices(matrix, u, v));
+
+    std::cout << "Стягивание ребра\n";
+    if (nonIsolatedVertices(matrix).empty()) {
+        std::cout << "Стягивание невозможно: в исходном графе нет рёбер.\n";
+    } else {
+        if (!readVertices(matrix, true, u, v)) {
+            return false;
+        }
+        std::cout << "После стягивания:\n";
+        printMatrix(contractEdge(matrix, u, v));
+    }
+
+    std::cout << "Расщепление вершины\n";
+    int vertex = 0;
+    while (readNumbers("Введите номер вершины: ", {&vertex})) {
+        if (vertex >= 1 && static_cast<std::size_t>(vertex) <= matrix.size()) {
+            std::cout << "После расщепления:\n";
+            printMatrix(splitVertex(matrix, vertex - 1));
+            return true;
+        }
+        std::cout << "Проверьте номер вершины.\n";
+    }
+    return false;
+}
+
+void showBinaryOperations(const Matrix& first, const Matrix& second) {
+    std::cout << "\nОбъединение G1 и G2:\n";
+    printMatrix(combineGraphs(first, second, GraphOperation::Union));
+    std::cout << "Пересечение G1 и G2:\n";
+    printMatrix(combineGraphs(first, second, GraphOperation::Intersection));
+
+    const Matrix difference = combineGraphs(first, second, GraphOperation::RingSum);
+    const Vertices labels = nonIsolatedVertices(difference);
+    std::cout << "Кольцевая сумма G1 и G2:\n";
+    if (!labels.empty()) {
+        std::cout << "Номера вершин по порядку строк и столбцов: ";
+        for (std::size_t label : labels) {
+            std::cout << label + 1 << ' ';
+        }
+        std::cout << '\n';
+    }
+    printMatrix(keepVertices(difference, labels));
 }
 
 int main() {
-    srand((unsigned int)time(NULL));
-    setlocale(LC_ALL, ".UTF8");
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
 
-    int N, N2;
-
-    printf("Введите количество вершин графа: ");
-    scanf("%d", &N);
-
-    printf("Введите количество вершин 2 графа: ");
-    scanf("%d", &N2);
-
-    if (N < 2 || N2 < 2) {
-        printf("Ошибка: в каждом графе должно быть минимум 2 вершины.\n");
+    int firstSize = 0;
+    int secondSize = 0;
+    if (!readGraphSize("Введите число вершин графа G1: ", firstSize)
+        || !readGraphSize("Введите число вершин графа G2: ", secondSize)) {
         return 1;
     }
 
-    int** matrix = (int**)malloc(N * sizeof(int*));
-    int** matrix2 = (int**)malloc(N2 * sizeof(int*));
-
-    if (matrix == NULL || matrix2 == NULL) {
-        printf("Ошибка выделения памяти.\n");
-        free(matrix);
-        free(matrix2);
-        return 1;
-    }
-
-    for (int i = 0; i < N; i++) {
-        matrix[i] = (int*)malloc(N * sizeof(int));
-
-        if (matrix[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(matrix[j]);
-            }
-            free(matrix);
-            free(matrix2);
+    try {
+        const Matrix first = generateMatrix(firstSize);
+        const Matrix second = generateMatrix(secondSize);
+        std::cout << "\nМатрица смежности G1:\n";
+        printMatrix(first);
+        std::cout << "\nМатрица смежности G2:\n";
+        printMatrix(second);
+        if (!showUnaryOperations(first, 1) || !showUnaryOperations(second, 2)) {
             return 1;
         }
-    }
-
-    for (int i = 0; i < N2; i++) {
-        matrix2[i] = (int*)malloc(N2 * sizeof(int));
-
-        if (matrix2[i] == NULL) {
-            for (int j = 0; j < i; j++) {
-                free(matrix2[j]);
-            }
-            free(matrix2);
-
-            for (int j = 0; j < N; j++) {
-                free(matrix[j]);
-            }
-            free(matrix);
-            return 1;
-        }
-    }
-
-    generateMatrix(matrix, N);
-    generatesecondMatrix(matrix2, N2);
-
-    printf("\nМатрица смежности первого графа:\n");
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nМатрица смежности второго графа:\n");
-
-    for (int i = 0; i < N2; i++) {
-        for (int j = 0; j < N2; j++) {
-            printf("%d ", matrix2[i][j]);
-        }
-        printf("\n");
-    }
-
-    int u, v;
-    int** newMatrix = NULL;
-    int** newMatrix2 = NULL;
-
-    printf("\nОтождествление вершин первого графа.\n");
-    printf("Введите номера двух вершин: ");
-    scanf("%d %d", &u, &v);
-
-    if (u < 1 || u > N || v < 1 || v > N || u == v) {
-        printf("Ошибка: введены некорректные номера вершин.\n");
+        showBinaryOperations(first, second);
+    } catch (const std::exception& error) {
+        std::cerr << "Ошибка: " << error.what() << '\n';
         return 1;
     }
-
-    newMatrix = identifyVertices(matrix, N, u - 1, v - 1);
-
-    if (newMatrix == NULL) {
-        printf("Ошибка создания новой матрицы.\n");
-        return 1;
-    }
-
-    for (int i = 0; i < N; i++) {
-        free(matrix[i]);
-    }
-    free(matrix);
-
-    matrix = newMatrix;
-    N--;
-
-    printf("\nМатрица первого графа после отождествления:\n");
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nСтягивание ребра первого графа.\n");
-    printf("Введите номера двух вершин: ");
-    scanf("%d %d", &u, &v);
-
-    if (u < 1 || u > N || v < 1 || v > N || u == v) {
-        printf("Ошибка: введены некорректные номера вершин.\n");
-        return 1;
-    }
-    else if (matrix[u - 1][v - 1] != 1) {
-        printf("Ошибка: введенные вершины не соединены ребром.\n");
-        return 1;
-    }
-    else {
-        newMatrix = contractEdge(matrix, N, u - 1, v - 1);
-
-        if (newMatrix == NULL) {
-            printf("Ошибка создания новой матрицы.\n");
-            return 1;
-        }
-
-        for (int i = 0; i < N; i++) {
-            free(matrix[i]);
-        }
-        free(matrix);
-
-        matrix = newMatrix;
-        N--;
-
-        printf("\nМатрица первого графа после стягивания ребра:\n");
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                printf("%d ", matrix[i][j]);
-            }
-            printf("\n");
-        }
-    }
-
-    printf("\nРасщепление вершины первого графа.\n");
-    printf("Введите номер вершины: ");
-    scanf("%d", &u);
-
-    if (u < 1 || u > N) {
-        printf("Ошибка: введен некорректный номер вершины.\n");
-        return 1;
-    }
-
-    newMatrix = splitVertex(matrix, N, u - 1);
-
-    if (newMatrix == NULL) {
-        printf("Ошибка создания новой матрицы.\n");
-        return 1;
-    }
-
-    for (int i = 0; i < N; i++) {
-        free(matrix[i]);
-    }
-    free(matrix);
-
-    matrix = newMatrix;
-    N++;
-
-    printf("\nМатрица первого графа после расщепления вершины:\n");
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            printf("%d ", matrix[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nОтождествление вершин второго графа.\n");
-    printf("Введите номера двух вершин: ");
-    scanf("%d %d", &u, &v);
-
-    if (u < 1 || u > N2 || v < 1 || v > N2 || u == v) {
-        printf("Ошибка: введены некорректные номера вершин.\n");
-        return 1;
-    }
-
-    newMatrix2 = identifyVertices(matrix2, N2, u - 1, v - 1);
-
-    if (newMatrix2 == NULL) {
-        printf("Ошибка создания новой матрицы.\n");
-        return 1;
-    }
-
-    for (int i = 0; i < N2; i++) {
-        free(matrix2[i]);
-    }
-    free(matrix2);
-
-    matrix2 = newMatrix2;
-    N2--;
-
-    printf("\nМатрица второго графа после отождествления:\n");
-
-    for (int i = 0; i < N2; i++) {
-        for (int j = 0; j < N2; j++) {
-            printf("%d ", matrix2[i][j]);
-        }
-        printf("\n");
-    }
-
-    printf("\nСтягивание ребра второго графа.\n");
-    printf("Введите номера двух вершин: ");
-    scanf("%d %d", &u, &v);
-
-    if (u < 1 || u > N2 || v < 1 || v > N2 || u == v) {
-        printf("Ошибка: введены некорректные номера вершин.\n");
-        return 1;
-    }
-    else if (matrix2[u - 1][v - 1] != 1) {
-        printf("Ошибка: введенные вершины не соединены ребром.\n");
-        return 1;
-    }
-    else {
-        newMatrix2 = contractEdge(matrix2, N2, u - 1, v - 1);
-
-        if (newMatrix2 == NULL) {
-            printf("Ошибка создания новой матрицы.\n");
-            return 1;
-        }
-
-        for (int i = 0; i < N2; i++) {
-            free(matrix2[i]);
-        }
-        free(matrix2);
-
-        matrix2 = newMatrix2;
-        N2--;
-
-        printf("\nМатрица второго графа после стягивания ребра:\n");
-
-        for (int i = 0; i < N2; i++) {
-            for (int j = 0; j < N2; j++) {
-                printf("%d ", matrix2[i][j]);
-            }
-            printf("\n");
-        }
-    }
-
-    printf("\nРасщепление вершины второго графа.\n");
-    printf("Введите номер вершины: ");
-    scanf("%d", &u);
-
-    if (u < 1 || u > N2) {
-        printf("Ошибка: введен некорректный номер вершины.\n");
-        return 1;
-    }
-
-    newMatrix2 = splitVertex(matrix2, N2, u - 1);
-
-    if (newMatrix2 == NULL) {
-        printf("Ошибка создания новой матрицы.\n");
-        return 1;
-    }
-
-    for (int i = 0; i < N2; i++) {
-        free(matrix2[i]);
-    }
-    free(matrix2);
-
-    matrix2 = newMatrix2;
-    N2++;
-
-    printf("\nМатрица второго графа после расщепления вершины:\n");
-
-    for (int i = 0; i < N2; i++) {
-        for (int j = 0; j < N2; j++) {
-            printf("%d ", matrix2[i][j]);
-        }
-        printf("\n");
-    }
-
-    for (int i = 0; i < N; i++) {
-        free(matrix[i]);
-    }
-    free(matrix);
-
-    for (int i = 0; i < N2; i++) {
-        free(matrix2[i]);
-    }
-    free(matrix2);
-
     return 0;
 }
